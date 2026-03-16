@@ -1,22 +1,13 @@
-import google.generativeai as genai
-import os
+import base64
 import json
-
-genai.configure(
-    api_key=os.getenv("GEMINI_API_KEY")
-)
-
-model = genai.GenerativeModel(
-    "gemini-2.0-flash-preview-image-generation"
-)
+from backend.core.gemini_client import client
 
 def analyze_image(base64_image):
 
     prompt = """
+You are an AI camera coach.
 
-You are an AI camera coach for creators.
-
-Analyze this image for content quality.
+Analyze this image for creator content quality.
 
 Evaluate:
 
@@ -25,7 +16,7 @@ Background cleanliness (0-100)
 Camera framing (0-100)
 Face visibility (0-100)
 
-Return ONLY JSON:
+Return STRICT JSON:
 
 {
 "lighting": number,
@@ -35,30 +26,36 @@ Return ONLY JSON:
 "suggestions":[]
 }
 
-Suggestions must be short actionable camera improvements.
-
+Suggestions must be short camera improvements.
 """
 
-    response = model.generate_content([
+    image_bytes = base64.b64decode(base64_image)
 
-        prompt,
+    response = client.models.generate_content(
 
-        {
-            "mime_type":"image/jpeg",
-            "data":base64_image
-        }
+        model="gemini-3-pro-image-preview",
 
-    ])
+        contents=[
 
-    text = response.text
+            prompt,
+
+            types.Part.from_bytes(
+                data=image_bytes,
+                mime_type="image/jpeg"
+            )
+
+        ]
+
+    )
+
+    text=response.text
 
     try:
 
-        start = text.find("{")
+        start=text.find("{")
+        end=text.rfind("}")+1
 
-        end = text.rfind("}")+1
-
-        clean = text[start:end]
+        clean=text[start:end]
 
         return json.loads(clean)
 
@@ -67,13 +64,9 @@ Suggestions must be short actionable camera improvements.
         return {
 
             "lighting":70,
-
             "background":70,
-
             "framing":70,
-
             "face":70,
-
             "suggestions":[
                 "Improve lighting",
                 "Adjust camera angle"
