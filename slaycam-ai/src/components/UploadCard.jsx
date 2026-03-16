@@ -1,4 +1,4 @@
-export default function UploadCard({file,setFile,analyze}){
+export default function UploadCard({file,setFile,setFileObj,analyze}){
 
 function handleFile(e){
 
@@ -7,6 +7,8 @@ const selected=e.target.files[0];
 if(selected){
 
 setFile(URL.createObjectURL(selected));
+
+setFileObj(selected);
 
 }
 

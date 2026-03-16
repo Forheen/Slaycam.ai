@@ -5,30 +5,62 @@ import UploadCard from "../components/UploadCard.jsx";
 export default function Landing(){
 
 const[file,setFile]=useState(null);
+
+const[fileObj,setFileObj]=useState(null);
 const[result,setResult]=useState(null);
 const[loading,setLoading]=useState(false);
 
-function analyze(){
+async function analyze(fileObj){
+
+if(!fileObj){
+
+alert("Upload image first");
+
+return;
+
+}
 
 setLoading(true);
 
-setTimeout(()=>{
+const formData=new FormData();
+
+formData.append("file",fileObj);
+
+try{
+
+const response=await fetch(
+
+"https://slaycam-backend.vercel.app/api/analyze",
+
+{
+
+method:"POST",
+
+body:formData
+
+}
+
+);
+
+const data=await response.json();
 
 setResult({
 
-score:86,
+score:data.score,
 
-tips:[
-"Face soft window light",
-"Raise camera slightly",
-"Use clean background"
-]
+tips:data.analysis.suggestions
 
 });
 
-setLoading(false);
+}catch(e){
 
-},1200);
+console.log(e);
+
+alert("Analysis failed");
+
+}
+
+setLoading(false);
 
 }
 
@@ -84,18 +116,18 @@ See Demo
 Check your Slay Score
 
 </h2>
-
 <UploadCard
 file={file}
 setFile={setFile}
-analyze={analyze}
+setFileObj={setFileObj}
+analyze={()=>analyze(fileObj)}
 />
 
 {loading &&(
 
 <div className="loading">
 
-Analyzing setup…
+AI analyzing your setup…
 
 </div>
 
