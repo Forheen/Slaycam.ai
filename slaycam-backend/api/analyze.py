@@ -3,9 +3,21 @@ import base64
 
 from services.gemini_service import analyze_image
 from utils.scoring import calculate_score
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+app.add_middleware(
+
+CORSMiddleware,
+
+allow_origins=["*"],
+
+allow_methods=["*"],
+
+allow_headers=["*"]
+
+)
 @app.get("/")
 def root():
     return {"status":"SlayCam backend running"}
