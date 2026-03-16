@@ -1,13 +1,22 @@
 import base64
 import json
-from backend.core.gemini_client import client
+import os
+
+from google import genai
+from google.genai import types
+
+client = genai.Client(
+    api_key=os.getenv("GEMINI_API_KEY")
+)
+
+TEXT_MODEL="gemini-3-pro-image-preview"
 
 def analyze_image(base64_image):
 
     prompt = """
 You are an AI camera coach.
 
-Analyze this image for creator content quality.
+Analyze this creator image.
 
 Evaluate:
 
@@ -26,14 +35,14 @@ Return STRICT JSON:
 "suggestions":[]
 }
 
-Suggestions must be short camera improvements.
+Suggestions must be actionable camera improvements.
 """
 
     image_bytes = base64.b64decode(base64_image)
 
     response = client.models.generate_content(
 
-        model="gemini-3-pro-image-preview",
+        model=TEXT_MODEL,
 
         contents=[
 
@@ -53,6 +62,7 @@ Suggestions must be short camera improvements.
     try:
 
         start=text.find("{")
+
         end=text.rfind("}")+1
 
         clean=text[start:end]
@@ -67,6 +77,7 @@ Suggestions must be short camera improvements.
             "background":70,
             "framing":70,
             "face":70,
+
             "suggestions":[
                 "Improve lighting",
                 "Adjust camera angle"
