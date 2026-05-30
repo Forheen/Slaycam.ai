@@ -11,7 +11,7 @@ client = genai.Client(
 
 # gemini-2.0-flash   → fastest, cheapest — good for high volume
 # gemini-2.5-pro     → smarter, richer coaching — better results
-VISION_MODEL = "gemini-3-pro-image-preview"
+VISION_MODEL = "gemini-2.0-flash"
 
 SYSTEM_PROMPT = """You are SlayCam, an elite face-specific photo coach.
 Your job is NOT to describe the photo or praise it generically.
